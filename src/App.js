@@ -40,7 +40,7 @@ function App() {
     formData.append('file', audioBlob, 'input.webm');
 
     try {
-      const response = await axios.post('https://your-backend-api.com/chat-audio', formData);
+      const response = await axios.post('http://127.0.0.1:8000/chat-audio', formData);
       setResponseText(response.data.text);
       setResponseAudio(response.data.audio_url); // URL to TTS audio file
     } catch (err) {
