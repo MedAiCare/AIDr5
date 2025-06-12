@@ -1,89 +1,75 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
 function App() {
   const [audioBlob, setAudioBlob] = useState(null);
   const [responseAudio, setResponseAudio] = useState(null);
   const [responseText, setResponseText] = useState('');
+  const [recording, setRecording] = useState(false);
   const [loading, setLoading] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
 
-  const handleRecord = async () => {
+  const handleStartRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const mediaRecorder = new MediaRecorder(stream);
-    let chunks = [];
+    chunksRef.current = [];
 
-    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.ondataavailable = (e) => chunksRef.current.push(e.data);
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'audio/mp3' });
+      const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
       setAudioBlob(blob);
     };
 
+    mediaRecorderRef.current = mediaRecorder;
     mediaRecorder.start();
-    setTimeout(() => mediaRecorder.stop(), 5000);
+    setRecording(true);
+  };
+
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
   };
 
   const handleSend = async () => {
     if (!audioBlob) return;
     setLoading(true);
     const formData = new FormData();
-    formData.append('file', audioBlob, 'input.mp3');
+    formData.append('file', audioBlob, 'input.webm');
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/chat-audio', formData);
-      const data = response.data;
-
-      // تحويل النص الصوتي (base64) إلى Blob
-      const audioBytes = atob(data.audio);
-      const byteArray = new Uint8Array(audioBytes.length);
-      for (let i = 0; i < audioBytes.length; i++) {
-        byteArray[i] = audioBytes.charCodeAt(i);
-      }
-      const audioBlob = new Blob([byteArray], { type: 'audio/mpeg' });
-      const audioURL = URL.createObjectURL(audioBlob);
-
-      setResponseAudio(audioURL);
-      setResponseText(data.text);
+      const response = await axios.post('https://your-backend-api.com/chat-audio', formData);
+      setResponseText(response.data.text);
+      setResponseAudio(response.data.audio_url); // URL to TTS audio file
     } catch (err) {
-      console.error('حدث خطأ:', err);
+      console.error('حدث خطأ أثناء الاتصال بالخادم:', err);
     }
-
     setLoading(false);
   };
 
   return (
-    <div style={{
-      maxWidth: 600,
-      margin: 'auto',
-      background: '#fff',
-      padding: 30,
-      borderRadius: 8,
-      boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-      direction: 'rtl'
-    }}>
-      <h1 style={{ color: '#444' }}>مساعد AIDr5 الصوتي</h1>
-      <p>اضغط على زر التسجيل، تحدث، ثم استمع واقرأ رد الذكاء الاصطناعي.</p>
+    <div style={{ maxWidth: 600, margin: 'auto', padding: 30 }}>
+      <h1>🧠 AIDr5 - محادثة صوتية ذكية</h1>
+      <p>ابدأ الحديث متى شئت، ثم أوقف التسجيل للاستماع إلى رد AIDr5.</p>
 
-      <button onClick={handleRecord} style={{ margin: 10, padding: '10px 20px' }}>
-        🎙️ تسجيل 5 ثوانٍ
+      <button onClick={handleStartRecording} disabled={recording}>
+        🎙️ ابدأ التسجيل
       </button>
-      <button onClick={handleSend} disabled={!audioBlob} style={{ margin: 10, padding: '10px 20px' }}>
-        🚀 إرسال
+      <button onClick={handleStopRecording} disabled={!recording}>
+        ⏹️ أوقف التسجيل
+      </button>
+      <button onClick={handleSend} disabled={!audioBlob || loading}>
+        🚀 إرسال الصوت
       </button>
 
-      {loading && <p>⏳ جاري المعالجة...</p>}
+      {loading && <p>⏳ جاري تحليل الحديث والرد...</p>}
 
       {responseText && (
         <div style={{ marginTop: 20 }}>
-          <p>🧠 الرد النصي من AIDr5:</p>
-          <div style={{
-            background: '#f9f9f9',
-            padding: '10px',
-            borderRadius: '5px',
-            border: '1px solid #ccc'
-          }}>
-            {responseText}
-          </div>
+          📝 <strong>النص:</strong>
+          <div>{responseText}</div>
         </div>
       )}
 
@@ -98,4 +84,3 @@ function App() {
 }
 
 export default App;
-
