@@ -40,9 +40,9 @@ function App() {
     formData.append('file', audioBlob, 'input.webm');
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/chat-audio', formData);
+      const response = await axios.post('http://127.0.0.1:8000/chat-audio', formData); // backend local
       setResponseText(response.data.text);
-      setResponseAudio(response.data.audio_url); // URL to TTS audio file
+      setResponseAudio(response.data.audio_url); // backend should return TTS URL
     } catch (err) {
       console.error('حدث خطأ أثناء الاتصال بالخادم:', err);
     }
@@ -51,31 +51,25 @@ function App() {
 
   return (
     <div style={{ maxWidth: 600, margin: 'auto', padding: 30 }}>
-      <h1>🧠 AIDr5 - محادثة صوتية ذكية</h1>
-      <p>ابدأ الحديث متى شئت، ثم أوقف التسجيل للاستماع إلى رد AIDr5.</p>
+      <h1>🧠 AIDr5 - محادثة صوتية تفاعلية</h1>
+      <p>اضغط لبدء التسجيل وتحدث، ثم أوقف التسجيل واستمع للرد.</p>
 
-      <button onClick={handleStartRecording} disabled={recording}>
-        🎙️ ابدأ التسجيل
-      </button>
-      <button onClick={handleStopRecording} disabled={!recording}>
-        ⏹️ أوقف التسجيل
-      </button>
-      <button onClick={handleSend} disabled={!audioBlob || loading}>
-        🚀 إرسال الصوت
-      </button>
+      <button onClick={handleStartRecording} disabled={recording}>🎙️ ابدأ التسجيل</button>
+      <button onClick={handleStopRecording} disabled={!recording}>⏹️ أوقف التسجيل</button>
+      <button onClick={handleSend} disabled={!audioBlob || loading}>🚀 إرسال الصوت</button>
 
-      {loading && <p>⏳ جاري تحليل الحديث والرد...</p>}
+      {loading && <p>⏳ جاري معالجة الصوت...</p>}
 
       {responseText && (
         <div style={{ marginTop: 20 }}>
-          📝 <strong>النص:</strong>
+          <strong>📝 النص:</strong>
           <div>{responseText}</div>
         </div>
       )}
 
       {responseAudio && (
         <div style={{ marginTop: 20 }}>
-          <p>🎧 الرد الصوتي من AIDr5:</p>
+          <p>🎧 الرد الصوتي:</p>
           <audio controls src={responseAudio} autoPlay />
         </div>
       )}
