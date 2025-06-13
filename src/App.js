@@ -50,100 +50,39 @@ function App() {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>🤖 AIDr5 - المساعد الصوتي</h1>
-      <p style={styles.subtitle}>
-        تحدث بحرية، واضغط على "إرسال" لسماع رد الذكاء الاصطناعي.
-      </p>
+    <div style={{
+      maxWidth: 480,
+      margin: 'auto',
+      padding: 20,
+      fontFamily: 'Arial, sans-serif',
+      textAlign: 'center'
+    }}>
+      <h2>🧠 مساعد AIDr5 الصوتي</h2>
+      <p>ابدأ الحديث ثم أوقف التسجيل للاستماع إلى الرد.</p>
 
-      <div style={styles.buttonGroup}>
-        <button onClick={handleStartRecording} disabled={recording} style={styles.button}>
-          🎙️ ابدأ التسجيل
-        </button>
-        <button onClick={handleStopRecording} disabled={!recording} style={styles.button}>
-          ⏹️ أوقف التسجيل
-        </button>
-        <button onClick={handleSend} disabled={!audioBlob || loading} style={styles.sendButton}>
-          🚀 إرسال الصوت
-        </button>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', marginTop: 20 }}>
+        <button onClick={handleStartRecording} disabled={recording}>🎙️ ابدأ التسجيل</button>
+        <button onClick={handleStopRecording} disabled={!recording}>⏹️ إيقاف</button>
+        <button onClick={handleSend} disabled={!audioBlob || loading}>🚀 إرسال</button>
       </div>
 
-      {loading && <p style={styles.loading}>⏳ جاري تحليل الحديث...</p>}
+      {loading && <p style={{ marginTop: 20 }}>⏳ جاري التحليل...</p>}
 
       {responseText && (
-        <div style={styles.card}>
+        <div style={{ marginTop: 30, textAlign: 'right' }}>
           <strong>📝 النص:</strong>
-          <p>{responseText}</p>
+          <div>{responseText}</div>
         </div>
       )}
 
       {responseAudio && (
-        <div style={styles.card}>
-          <strong>🎧 الرد الصوتي:</strong>
+        <div style={{ marginTop: 20 }}>
+          <p>🎧 الرد الصوتي:</p>
           <audio controls src={responseAudio} autoPlay />
         </div>
       )}
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '600px',
-    margin: '40px auto',
-    padding: '30px',
-    borderRadius: '12px',
-    backgroundColor: '#f9f9f9',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-    fontFamily: 'Segoe UI, sans-serif',
-    textAlign: 'center',
-  },
-  title: {
-    fontSize: '28px',
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: '16px',
-    color: '#666',
-    marginBottom: '20px',
-  },
-  buttonGroup: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '12px',
-    flexWrap: 'wrap',
-    marginBottom: '20px',
-  },
-  button: {
-    padding: '10px 20px',
-    fontSize: '15px',
-    backgroundColor: '#eee',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    cursor: 'pointer',
-  },
-  sendButton: {
-    padding: '10px 20px',
-    fontSize: '15px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-  },
-  loading: {
-    color: '#FF9800',
-    fontWeight: 'bold',
-    marginTop: '20px',
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: '15px 20px',
-    marginTop: '20px',
-    borderRadius: '8px',
-    border: '1px solid #ddd',
-    textAlign: 'left',
-  },
-};
 
 export default App;
