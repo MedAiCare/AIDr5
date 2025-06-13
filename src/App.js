@@ -40,9 +40,9 @@ function App() {
     formData.append('file', audioBlob, 'input.webm');
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/chat-audio', formData); // backend local
+      const response = await axios.post('https://your-backend-api.com/chat-audio', formData);
       setResponseText(response.data.text);
-      setResponseAudio(response.data.audio_url); // backend should return TTS URL
+      setResponseAudio(response.data.audio_url);
     } catch (err) {
       console.error('حدث خطأ أثناء الاتصال بالخادم:', err);
     }
@@ -50,31 +50,100 @@ function App() {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: 'auto', padding: 30 }}>
-      <h1>🧠 AIDr5 - محادثة صوتية تفاعلية</h1>
-      <p>اضغط لبدء التسجيل وتحدث، ثم أوقف التسجيل واستمع للرد.</p>
+    <div style={styles.container}>
+      <h1 style={styles.title}>🤖 AIDr5 - المساعد الصوتي</h1>
+      <p style={styles.subtitle}>
+        تحدث بحرية، واضغط على "إرسال" لسماع رد الذكاء الاصطناعي.
+      </p>
 
-      <button onClick={handleStartRecording} disabled={recording}>🎙️ ابدأ التسجيل</button>
-      <button onClick={handleStopRecording} disabled={!recording}>⏹️ أوقف التسجيل</button>
-      <button onClick={handleSend} disabled={!audioBlob || loading}>🚀 إرسال الصوت</button>
+      <div style={styles.buttonGroup}>
+        <button onClick={handleStartRecording} disabled={recording} style={styles.button}>
+          🎙️ ابدأ التسجيل
+        </button>
+        <button onClick={handleStopRecording} disabled={!recording} style={styles.button}>
+          ⏹️ أوقف التسجيل
+        </button>
+        <button onClick={handleSend} disabled={!audioBlob || loading} style={styles.sendButton}>
+          🚀 إرسال الصوت
+        </button>
+      </div>
 
-      {loading && <p>⏳ جاري معالجة الصوت...</p>}
+      {loading && <p style={styles.loading}>⏳ جاري تحليل الحديث...</p>}
 
       {responseText && (
-        <div style={{ marginTop: 20 }}>
+        <div style={styles.card}>
           <strong>📝 النص:</strong>
-          <div>{responseText}</div>
+          <p>{responseText}</p>
         </div>
       )}
 
       {responseAudio && (
-        <div style={{ marginTop: 20 }}>
-          <p>🎧 الرد الصوتي:</p>
+        <div style={styles.card}>
+          <strong>🎧 الرد الصوتي:</strong>
           <audio controls src={responseAudio} autoPlay />
         </div>
       )}
     </div>
   );
 }
+
+const styles = {
+  container: {
+    maxWidth: '600px',
+    margin: '40px auto',
+    padding: '30px',
+    borderRadius: '12px',
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+    fontFamily: 'Segoe UI, sans-serif',
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: '28px',
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: '16px',
+    color: '#666',
+    marginBottom: '20px',
+  },
+  buttonGroup: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+    marginBottom: '20px',
+  },
+  button: {
+    padding: '10px 20px',
+    fontSize: '15px',
+    backgroundColor: '#eee',
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  sendButton: {
+    padding: '10px 20px',
+    fontSize: '15px',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  loading: {
+    color: '#FF9800',
+    fontWeight: 'bold',
+    marginTop: '20px',
+  },
+  card: {
+    backgroundColor: '#fff',
+    padding: '15px 20px',
+    marginTop: '20px',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
+    textAlign: 'left',
+  },
+};
 
 export default App;
